@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, TabBarIOS, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -73,7 +72,11 @@ const Complete = ({navigation}) => {
 const All = ({navigation}) => {
   return(
     <View style={styles.container}>
-      <Text>All Screen</Text>
+      {
+        TODOS.map((todo,idx) => {
+        return <TodoItem key={todo.body} todo={todo} idx={idx}/>;
+        })
+      }
     </View>
   )
 }
