@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Constants from 'expo-constants';
-import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, View, ImageBackground, KeyboardAvoidingView } from 'react-native';
 import { NavigationContainer, StackActions } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -62,26 +62,33 @@ const Complete = ({navigation}) => {
     setTodoList(newTodoList);
   };
   return(
-    <ScrollView>
-      <View style={styles.container}>
-      {
-        todoList.map((todo,idx) => {
-          if (todo.status === 'Done'){
-            return(
-            <TodoItem 
-              key={todo.body}
-              todo={todo}
-              idx={idx}
-              showSingleTodo={()=>{}}
-              onToggleTodo={onToggleTodo}
-              onDeleteTodo={onDeleteTodo}
-            />
-            )
+    <ImageBackground style={styles.container} source={{ uri: 'https://images.pexels.com/photos/3585648/pexels-photo-3585648.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260' }}>
+      <KeyboardAvoidingView
+        enabled
+        behavior="padding"
+      >
+        <ScrollView>
+          <View style={styles.container}>
+          {
+            todoList.map((todo,idx) => {
+              if (todo.status === 'Done'){
+                return(
+                <TodoItem 
+                  key={todo.body}
+                  todo={todo}
+                  idx={idx}
+                  showSingleTodo={()=>{}}
+                  onToggleTodo={onToggleTodo}
+                  onDeleteTodo={onDeleteTodo}
+                />
+                )
+              }
+            })
           }
-        })
-      }
-      </View>
-    </ScrollView>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </ImageBackground>
   )
 }
 
@@ -120,36 +127,44 @@ const All = ({navigation}) => {
   };
   
   return(
-    <ScrollView>
-      <View style={styles.container}>
-        <View style={{alignItems:'center'}}>
-          {
-          todoList.map((todo,idx) => {
-            return (
-                <TodoItem 
-                  key={todo.body}
-                  todo={todo}
-                  idx={idx}
-                  showSingleTodo={showSingleTodo}
-                  onToggleTodo={onToggleTodo}
-                  onDeleteTodo={onDeleteTodo}
+    <ImageBackground style={styles.container} source={{ uri: 'https://images.pexels.com/photos/3585648/pexels-photo-3585648.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260' }}>
+      <KeyboardAvoidingView
+        enabled
+        behavior="padding"
+      >
+        <ScrollView>
+          <View style={styles.container}>
+            <View style={{alignItems:'center'}}>
+              {
+              todoList.map((todo,idx) => {
+                return (
+                    <TodoItem 
+                      key={todo.body}
+                      todo={todo}
+                      idx={idx}
+                      showSingleTodo={showSingleTodo}
+                      onToggleTodo={onToggleTodo}
+                      onDeleteTodo={onDeleteTodo}
+                    />
+                )
+              })
+              }
+              <View style={styles.inputContainer}>
+                <TextInput
+                  value={todoBody}
+                  style={styles.todoInput}
+                  onChangeText={text => setTodoBody(text)}
                 />
-            )
-          })
-          }
-          <View style={styles.inputContainer}>
-            <TextInput
-              value={todoBody}
-              style={styles.todoInput}
-              onChangeText={text => setTodoBody(text)}
-            />
-            <TouchableOpacity style={styles.button} onPress={onSubmitTodo}>
-              <Text style={styles.buttonText}>Submit</Text>
-            </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={onSubmitTodo}>
+                  <Text style={styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-    </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </ImageBackground>
+
   )
 }
 
@@ -170,26 +185,33 @@ const Active = ({navigation}) => {
       setTodoList(newTodoList);
     };
     return(
-      <ScrollView>
-        <View style={styles.container}>
-        {
-          todoList.map((todo,idx) => {
-            if (todo.status === 'Active'){
-              return(
-              <TodoItem 
-                key={todo.body}
-                todo={todo}
-                idx={idx}
-                showSingleTodo={()=>{}}
-                onToggleTodo={onToggleTodo}
-                onDeleteTodo={onDeleteTodo}
-              />
-              )
+      <ImageBackground style={styles.container} source={{ uri: 'https://images.pexels.com/photos/3585648/pexels-photo-3585648.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260' }}>
+        <KeyboardAvoidingView
+          enabled
+          behavior="padding"
+        >
+          <ScrollView>
+            <View style={styles.container}>
+            {
+              todoList.map((todo,idx) => {
+                if (todo.status === 'Active'){
+                  return(
+                  <TodoItem 
+                    key={todo.body}
+                    todo={todo}
+                    idx={idx}
+                    showSingleTodo={()=>{}}
+                    onToggleTodo={onToggleTodo}
+                    onDeleteTodo={onDeleteTodo}
+                  />
+                  )
+                }
+              })
             }
-          })
-        }
-        </View>
-      </ScrollView>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </ImageBackground>
     )
 }
 
@@ -283,10 +305,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Constants.statusBarHeight,
   },
   todoItem: {
-    margin: 5,
+    marginHorizontal: 5,
+    marginTop:12,
     padding: 10,
     width: 320,
     minHeight: 20,
