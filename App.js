@@ -14,55 +14,7 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
-const BLUE_COLOR = "#4066ed";
-const GREEN_COLOR = "#2E7D32";
-
-const TodoItem = props => {
-  const statusStyle = {
-    backgroundColor: props.todo.status === "Done" ? BLUE_COLOR : GREEN_COLOR,
-  };
-
-  const onLongPress = todo => {
-    const prompt = `"${todo.body}"`;
-    Alert.alert(
-      'Delete your to-do?',
-      prompt,
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel'
-        },
-        { text: 'OK', onPress: () => props.onDeleteTodo(todo.id)}
-      ],
-      { cancelable: true }
-    );
-  };
-
-  return (
-    <TouchableOpacity
-      key={props.todo.body}
-      style={[styles.todoItem, statusStyle]}
-      onPress={() => props.showSingleTodo(props.todo)}
-      // onLongPress={() => props.onToggleTodo(props.todo.id)}
-      // onPress={() => props.onToggleTodo(props.todo.id)}
-      onLongPress={() => onLongPress(props.todo)}
-      >
-      <Text style={styles.todoText}>
-        {props.idx + 1}: {props.todo.body}
-      </Text>
-    </TouchableOpacity>
-  )
-}
-
-const Complete = ({navigation}) => {
-  return(
-    <View style={styles.container}>
-      <Text>Complete Screen</Text>
-    </View>
-  )
-}
+// var todoList, setTodoList;
 
 const AllStack = () => {
   return(
@@ -72,6 +24,64 @@ const AllStack = () => {
       <Stack.Screen name="All Todos" component={All}/>
       <Stack.Screen name="SingleTodoScreen" component={SingleTodoScreen}/>
     </Stack.Navigator>
+  )
+}
+const ActiveStack = () => {
+  return(
+    <Stack.Navigator 
+      initialRouteName="Active"
+      screenOptions={{headerTitleContainerStyle: {alignItems:'center'}}}>
+      <Stack.Screen name="Active" component={Active}/>
+    </Stack.Navigator>
+  )
+}
+const CompleteStack = () => {
+  return(
+    <Stack.Navigator 
+      initialRouteName="Complete"
+      screenOptions={{headerTitleContainerStyle: {alignItems:'center'}}}>
+      <Stack.Screen name="Complete" component={Complete}/>
+    </Stack.Navigator>
+  )
+}
+
+const Complete = ({navigation}) => {
+  const [todoList, setTodoList] = useState(TODOS);
+  
+  const onToggleTodo = id => {
+    const todo = todoList.find(todo => todo.id === id);
+    todo.status = todo.status === 'Done' ? 'Active' : 'Done';
+    const foundIndex = todoList.findIndex(todo => todo.id === id);
+    todoList[foundIndex] = todo;
+    const newTodoList = [...todoList];
+    setTodoList(newTodoList);
+  };
+
+  const onDeleteTodo = id => {
+    const newTodoList = todoList.filter(todo => todo.id !== id);
+    setTodoList(newTodoList);
+  };
+  return(
+    <ScrollView>
+      <View style={styles.container}>
+      {
+        todoList.map((todo,idx) => {
+          if (todo.status === 'Done'){
+            return(
+            <TodoItem 
+              key={todo.body}
+              todo={todo}
+              idx={idx}
+              showSingleTodo={()=>{}}
+              onToggleTodo={onToggleTodo}
+              onDeleteTodo={onDeleteTodo}
+            />
+            )
+          }
+        })
+      }
+      </View>
+    </ScrollView>
   )
 }
 
@@ -110,22 +120,22 @@ const All = ({navigation}) => {
   };
   
   return(
-    <View style={styles.container}>
-      <ScrollView>
+    <ScrollView>
+      <View style={styles.container}>
         <View style={{alignItems:'center'}}>
           {
-            TODOS.map((todo,idx) => {
-              return (
-                  <TodoItem 
-                    key={todo.body}
-                    todo={todo}
-                    idx={idx}
-                    showSingleTodo={showSingleTodo}
-                    onToggleTodo={onToggleTodo}
-                    onDeleteTodo={onDeleteTodo}
-                  />
-              )
-            })
+          todoList.map((todo,idx) => {
+            return (
+                <TodoItem 
+                  key={todo.body}
+                  todo={todo}
+                  idx={idx}
+                  showSingleTodo={showSingleTodo}
+                  onToggleTodo={onToggleTodo}
+                  onDeleteTodo={onDeleteTodo}
+                />
+            )
+          })
           }
           <View style={styles.inputContainer}>
             <TextInput
@@ -138,9 +148,49 @@ const All = ({navigation}) => {
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   )
+}
+
+const Active = ({navigation}) => {
+  const [todoList, setTodoList] = useState(TODOS);
+
+  const onToggleTodo = id => {
+    const todo = todoList.find(todo => todo.id === id);
+    todo.status = todo.status === 'Done' ? 'Active' : 'Done';
+    const foundIndex = todoList.findIndex(todo => todo.id === id);
+    todoList[foundIndex] = todo;
+    const newTodoList = [...todoList];
+    setTodoList(newTodoList);
+  };
+
+  const onDeleteTodo = id => {
+    const newTodoList = todoList.filter(todo => todo.id !== id);
+      setTodoList(newTodoList);
+    };
+    return(
+      <ScrollView>
+        <View style={styles.container}>
+        {
+          todoList.map((todo,idx) => {
+            if (todo.status === 'Active'){
+              return(
+              <TodoItem 
+                key={todo.body}
+                todo={todo}
+                idx={idx}
+                showSingleTodo={()=>{}}
+                onToggleTodo={onToggleTodo}
+                onDeleteTodo={onDeleteTodo}
+              />
+              )
+            }
+          })
+        }
+        </View>
+      </ScrollView>
+    )
 }
 
 const SingleTodoScreen = ({ route }) => {
@@ -154,11 +204,42 @@ const SingleTodoScreen = ({ route }) => {
   );
 }
 
-const Active = ({navigation}) => {
-  return(
-    <View style={styles.container}>
-      <Text>Active Screen</Text>
-    </View>
+const TodoItem = props => {
+  const statusStyle = {
+    backgroundColor: props.todo.status === "Done" ? BLUE_COLOR : GREEN_COLOR,
+  };
+
+  const onLongPress = todo => {
+    const prompt = `"${todo.body}"`;
+    Alert.alert(
+      'Delete your to-do?',
+      prompt,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel'
+        },
+        { text: 'OK', onPress: () => props.onDeleteTodo(todo.id)}
+      ],
+      { cancelable: true }
+    );
+  };
+
+  return (
+    <TouchableOpacity
+      key={props.todo.body}
+      style={[styles.todoItem, statusStyle]}
+      onPress={() => {
+        props.onToggleTodo(props.todo.id);
+        props.showSingleTodo(props.todo);
+      }}
+      onLongPress={() => props.onToggleTodo(props.todo.id)}      onLongPress={() => onLongPress(props.todo)}
+      >
+      <Text style={styles.todoText}>
+        {props.idx + 1}: {props.todo.body}
+      </Text>
+    </TouchableOpacity>
   )
 }
 
@@ -186,13 +267,16 @@ export default function App() {
           }
         }
       >
-        <Tab.Screen name="Complete" component={Complete}/>
+        <Tab.Screen name="Complete" component={CompleteStack}/>
         <Tab.Screen name="All" component={AllStack}/>
-        <Tab.Screen name="Active" component={Active}/>
+        <Tab.Screen name="Active" component={ActiveStack}/>
       </Tab.Navigator>
     </NavigationContainer>
   );
 };
+
+const BLUE_COLOR = "#4066ed";
+const GREEN_COLOR = "#2E7D32";
 
 const styles = StyleSheet.create({
   container: {
@@ -215,7 +299,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   todoInput: {
-    width: '100%',
+    width: 300,
     color: 'black',
     borderRadius:10,
     paddingHorizontal: 10,
@@ -226,7 +310,6 @@ const styles = StyleSheet.create({
     borderColor: 'grey',
   },
   inputContainer: {
-    width: '90%',
     marginBottom: '5%',
     alignItems: 'center',
     justifyContent: 'center'
