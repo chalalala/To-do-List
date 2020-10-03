@@ -17,3 +17,6 @@ A Todo app using **React Native** & **Expo**. Our app will help users keep track
 * User can delete a todo by long pressing it and being prompted to confirm their action.
 * User can cancel deleting a todo.
 * User can slide the todos list to see the entire app wallpaper.
+
+## Demo
+![image](https://media4.giphy.com/media/TdOsdP52BQFZMJI2t0/giphy.gif)
