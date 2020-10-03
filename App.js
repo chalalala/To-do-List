@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Constants from 'expo-constants';
 import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, StackActions } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { Ionicons } from '@expo/vector-icons'; 
@@ -11,12 +12,15 @@ import { Octicons } from '@expo/vector-icons';
 import { TODOS } from './data.js';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 
-// const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+const BLUE_COLOR = "#4066ed";
+const GREEN_COLOR = "#2E7D32";
 
 const TodoItem = props => {
   const statusStyle = {
-    backgroundColor: props.todo.status === "Done" ? 'blue' : 'green',
+    backgroundColor: props.todo.status === "Done" ? BLUE_COLOR : GREEN_COLOR,
   };
 
   const onLongPress = todo => {
@@ -40,8 +44,11 @@ const TodoItem = props => {
     <TouchableOpacity
       key={props.todo.body}
       style={[styles.todoItem, statusStyle]}
-      onPress={() => props.onToggleTodo(props.todo.id)}
-      onLongPress={() => onLongPress(props.todo)}>
+      onPress={() => props.showSingleTodo(props.todo)}
+      // onLongPress={() => props.onToggleTodo(props.todo.id)}
+      // onPress={() => props.onToggleTodo(props.todo.id)}
+      onLongPress={() => onLongPress(props.todo)}
+      >
       <Text style={styles.todoText}>
         {props.idx + 1}: {props.todo.body}
       </Text>
@@ -57,9 +64,24 @@ const Complete = ({navigation}) => {
   )
 }
 
+const AllStack = () => {
+  return(
+    <Stack.Navigator 
+      initialRouteName="All"
+      screenOptions={{headerTitleContainerStyle: {alignItems:'center'}}}>
+      <Stack.Screen name="All Todos" component={All}/>
+      <Stack.Screen name="SingleTodoScreen" component={SingleTodoScreen}/>
+    </Stack.Navigator>
+  )
+}
+
 const All = ({navigation}) => {
   const [todoList, setTodoList] = useState(TODOS);
 
+  const showSingleTodo = todo =>{
+    navigation.navigate("SingleTodoScreen",todo);
+  }
+  
   const onToggleTodo = id => {
     const todo = todoList.find(todo => todo.id === id);
     todo.status = todo.status === 'Done' ? 'Active' : 'Done';
@@ -89,9 +111,8 @@ const All = ({navigation}) => {
   
   return(
     <View style={styles.container}>
-      <Text style={styles.header}>Message</Text>
       <ScrollView>
-        <View style={styles.todoContainer}>
+        <View style={{alignItems:'center'}}>
           {
             TODOS.map((todo,idx) => {
               return (
@@ -99,6 +120,7 @@ const All = ({navigation}) => {
                     key={todo.body}
                     todo={todo}
                     idx={idx}
+                    showSingleTodo={showSingleTodo}
                     onToggleTodo={onToggleTodo}
                     onDeleteTodo={onDeleteTodo}
                   />
@@ -119,6 +141,17 @@ const All = ({navigation}) => {
       </ScrollView>
     </View>
   )
+}
+
+const SingleTodoScreen = ({ route }) => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.headerText}>
+        {route.params?.id}. {route.params?.status}
+      </Text>
+      <Text style={styles.bodyText}>{route.params?.body}</Text>
+    </View>
+  );
 }
 
 const Active = ({navigation}) => {
@@ -154,7 +187,7 @@ export default function App() {
         }
       >
         <Tab.Screen name="Complete" component={Complete}/>
-        <Tab.Screen name="All" component={All}/>
+        <Tab.Screen name="All" component={AllStack}/>
         <Tab.Screen name="Active" component={Active}/>
       </Tab.Navigator>
     </NavigationContainer>
@@ -164,21 +197,9 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: Constants.statusBarHeight,
-  },
-  header: {
-    textAlign: 'center',
-    fontSize:22,
-    fontWeight:'700',
-    width:'100%',
-    paddingVertical:7,
-    backgroundColor: 'white'
-  },
-  todoContainer: {
-    alignItems: 'center',
   },
   todoItem: {
     margin: 5,
@@ -195,16 +216,17 @@ const styles = StyleSheet.create({
   },
   todoInput: {
     width: '100%',
-    color: 'white',
+    color: 'black',
+    borderRadius:10,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderWidth: 1,
     marginTop: 20,
     marginBottom: '5%',
-    borderColor: 'grey'
+    borderColor: 'grey',
   },
   inputContainer: {
-    width: '85%',
+    width: '90%',
     marginBottom: '5%',
     alignItems: 'center',
     justifyContent: 'center'
@@ -213,7 +235,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 50,
     borderRadius: 60,
-    backgroundColor: 'blue',
+    backgroundColor: 'rgb(71,113,246)',
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -221,5 +243,13 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     fontWeight: 'bold'
+  },
+  headerText:{
+    fontSize:25,
+  },
+  bodyText: {
+    width:'80%',
+    textAlign: 'center',
+    fontSize: 30,
   }
 });
